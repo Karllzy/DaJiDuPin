@@ -1,4 +1,6 @@
 \documentclass{mcmthesis}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
 \mcmsetup{CTeX = true,   % 使用 CTeX 套装时，设置为 true
         tcn = 0000, problem = C,% 队伍控制号码，接受一个字符串作为值；选题，接受一个字符串作为值；
         sheet = true, %为真时将输出摘要页，否则不输出；默认为 true。
@@ -76,18 +78,95 @@
 \end{tabular}
 
 
-\section{Analysis of the Problem}
-\begin{figure}[h]
-\small
-\centering
-\includegraphics[width=12cm]{mcmthesis-aaa.eps}
-\caption{aa} \label{fig:aa}
-\end{figure}
+\section{Model One - A Pretrained Neural Network}
+	\par In the first part of the problem one, we pretrain the weight of a neural and a new kind of way to train the weight of a neural network to describe the spread and characteristics of the reported synthetic opioid and heroin incidents in and between the five states. 
+	\subsection{Assumptions}
+		\begin{itemize}
+			\item We view the spread of the cases as a mulity variables time sequence. And there are $461$ counties which have drug abuse cases in these five states,so the spread of drug abuse cases in $t$ year is viewed as a time sequence like this: 
+				$$X(t) = ( x_{1}(t), x_{2}(t), ..., x_{461}(t) )$$
+				and for the next,  $t+1$ year should be like this:
+				$$X(t) = ( x_{1}(t+1), x_{2}(t+1), ..., x_{461}(t+1) )$$
+			\item The spread of opiod crisis has relationship with the location information of counties.Because the spread of opiod crisis is clearly with respece to the space spread.
+			\item The potential drug abuse cases in a county can be measured by the drug identification counts. To be simple, we assume the potential cases is proportional to the identification counts. 
+		\end{itemize}
+	\subsection{Establishing the model}
+	\par In each year, the time sequence $X(t)$ is with respect to the last year's $X(t-1)$, we can use a variable $w_{i, j}$ to describe the influence from last year's $x_{j}$ to the next year's $x_{i}$,
+	we can write them in the form of matrixs:
+		$$ X(t-1)W = X(t) $$
+	its topological graph will be like the following Figure \ref{fig:Topological Graph of Model One}:
+		\begin{figure}[h]
+			\includegraphics[width=12cm]{01_Model_One_diagram.png}
+			\centering
+			\caption{Model One Topological Graph} \label{fig:Topological Graph of Model One}
+		\end{figure}
+	\par According to our assumption, there is negative correlation between the value $w_{i, j}$ and the distance spreated from each other for two county.The influence of one county that described with $W_{:, j}$ will drop quickly with the distance increasing. Gauss Function is used to describe the spreaded influence as Figure \ref{fig:Gauss Weight Function}:
+		\begin{figure}
+			\includegraphics[width=12cm]{02_W_Gauss_Func.png}
+			\centering
+			\caption{Gauss Weight Function} \label{fig:Gauss Weight Function}
+		\end{figure}
+	\par We use this Function \ref{func:Gauss Weight Function} to fit the $W$'s value:
+		
+		$$W(d)= a \cdot exp(-\frac{d^2}{2c^2}) \label{func:Gauss Weight Function}$$
 
-\lipsum[8] \eqref{aa}
-\begin{equation}
-a^2 \label{aa}
-\end{equation}
+	\par In this function, the pramemter $a_{i, j}$ can control the capbility of last year's counties to contribute to the next year's counties's pontential drug cases. The pramemter $c_{i, j}$ can control the influence radius.
+	\par A \textbf{Spcefic Designed Back-Propagation Algorithm} is used to modify the two parameters step by step. 
+	\par To caculate the appropriate values for the $a_{i, j}$ and $c_{i, j}$, we regard the $w_{i, j}$ as the weights of a neural network with only a dense layer and define a loss Function \ref{func:Loss function for model one} to make our parameter more reasonable.
+		$$f_{loss}(W) = (\hat{X(t)} - X(t))^2 \label{func:Loss function for model one} $$
+	\par Here, the $\hat{X(t)}$ is the prediction of drug abuse sperad, the function can also be written as:
+		$$ f_{loss}(W) = X(t-1) \cdot W_{i, j} - X(t))^2 $$
+	\par According to the chain rule of calculus, we can compute the derivatives of functions formed by composing other functions whose derivatives are known. So we can compute the derivatives of the $f_{loss}$ about $c_{i, j}$ like this:
+		$$
+		\frac{\partial f_{loss}}{\partial c_{i,j}} = \frac{\partial f_{loss}}{\partial x_{i,j}}
+		\frac{\partial x_{i, j}}{\partial w_{i,j}} \frac{\partial w_{i,j}}{\partial c_{i, j}}
+		$$
+	\par Similarly, we can get the derivatives about $a$:
+		$$
+		\frac{\partial f_{loss}}{\partial c_{i,j}} = \frac{\partial f_{loss}}{\partial x_{i,j}}
+		\frac{\partial x_{i, j}}{\partial w_{i,j}} \frac{\partial w_{i,j}}{\partial a_{i, j}}
+		$$
+	\subsection{Results and Improvement of Model One}
+	
+	\par Then we can use this function to train the $C = c_{i, j}$ and $A = a_{i, j}$ to a appropriate value. The parameter $C$ represent the county's influence radius, and the praameter $c$ represent the county's ability to influence other counties around. We can get the figure 
+	
+	% 缺一张图！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par picture!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	\par In this figure, it shows the spread of the opioid crisis.Every county in this diagram has a circle filled in different color. The $C$ is represented by the radius sizes of circles which means how long a county can spread or releave the crisis to others. The $A$ is represented by the color of the circle which shows the ability of the county to spread crisis to others.
+	\par Till now we can use the model to describe the spread of opioid crisis
+	but we can't identify possible locations where specific opioid use might have started. So we are going to reversal our model to trace back the possible locations. 
+	% -------------------------------------------------------------------------------------------
+	
+	\par We want to make the reverse our model to trace back to the sources in each five states.
+	So our model will be 
+	\par With these 
+	
+	
+	
+	%---------------------------------------------------------------------------------------------
+	\par With the reversed model we can date back to the start of specific opioid use,which is shown in the picture below, these countise in each five sates are the possible locations we assert.
+	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	
+	\par In this section, we create a specfic neural network, and use specific designed Back-Propagation Algorithm to get two parameters which can describe the spread of the opioid crisis. But the disadvantange of the model is that it only take the $X(t-1)$ in to consideration, and simply trow away all the data before,such as $X(t-2), X(t-3),X(t-4)...$. This can cause inaccuracy when it pridict a long term future.
+	
+	
+\section{Model Two: A LSTM Neural Network}
+	
 
 \[
   \begin{pmatrix}{*{20}c}
