@@ -79,7 +79,7 @@
 
 
 \section{Model One - A Pretrained Neural Network}
-	\par In the first part of the problem one, we pretrain the weight of a neural and a new kind of way to train the weight of a neural network to describe the spread and characteristics of the reported synthetic opioid and heroin incidents in and between the five states. 
+	\par In the first part of the problem one, we pretrain the weight of a neural network and use a new kind of way to train the weight of a neural network to describe the spread and characteristics of the reported synthetic opioid and heroin incidents in and between the five states. 
 	\subsection{Assumptions}
 		\begin{itemize}
 			\item We view the spread of the cases as a mulity variables time sequence. And there are $461$ counties which have drug abuse cases in these five states,so the spread of drug abuse cases in $t$ year is viewed as a time sequence like this: 
@@ -144,16 +144,14 @@
 	\par In this figure, it shows the spread of the opioid crisis.Every county in this diagram has a circle filled in different color. The $C$ is represented by the radius sizes of circles which means how long a county can spread or releave the crisis to others. The $A$ is represented by the color of the circle which shows the ability of the county to spread crisis to others.
 	\par Till now we can use the model to describe the spread of opioid crisis
 	but we can't identify possible locations where specific opioid use might have started. So we are going to reversal our model to trace back the possible locations. 
-	% -------------------------------------------------------------------------------------------
 	
-	\par We want to make the reverse our model to trace back to the sources in each five states.
-	So our model will be 
-	\par With these 
+	The shape of the $W$ is $461 \times 461$, so the $W$ is sure to have an unique inverse matrix.
+	$$
+	X(t-1) = X(t) \cdot W^{-1}
+	$$  
 	
 	
-	
-	%---------------------------------------------------------------------------------------------
-	\par With the reversed model we can date back to the start of specific opioid use,which is shown in the picture below, these countise in each five sates are the possible locations we assert.
+	\par With the reversed model we can date back to the start of specific opioid use,which is shown in the picture below, these countise in each five sates are the possible locations.
 	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -162,11 +160,95 @@
 	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	\par false picture !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	
-	\par In this section, we create a specfic neural network, and use specific designed Back-Propagation Algorithm to get two parameters which can describe the spread of the opioid crisis. But the disadvantange of the model is that it only take the $X(t-1)$ in to consideration, and simply trow away all the data before,such as $X(t-2), X(t-3),X(t-4)...$. This can cause inaccuracy when it pridict a long term future.
+	\par In this section, we create a specfic neural network, and use specific designed Back-Propagation Algorithm to get two parameters which can describe the spread of the opioid crisis. But the disadvantange of the model is that it only take the $X(t-1)$ in to consideration, this can cause inaccuracy when it pridict a long term future.
 	
 	
 \section{Model Two: A LSTM Neural Network}
+	\subsection{Model Constration}
+		\par Even though Pretrained Neural Network can describe the spread of opioid crisis, it is  at predict the data in the future accurately. To overcome this problem, we add a Long Short-Term Memory(LSTM) layer to our neural network model. 
+		\par LSTM is a Recurrent Neural Network(RNN) with special structure as below.
+			\begin{figure}[h]
+				\includegraphics[width=12cm]{05_model_two_diagram}
+				\centering
+				\caption{Unfolding Computational Graphs of LSTM Layer} \label{fig:05_model_two_diagram}
+			\end{figure}
+		\par Unlike other machine learning algorithms, long short-term memory recurrent neural networks are capable of automatically learning features from sequence data, multiple-variate data, and can output a variable length sequences that can be used for multi-step forecasting.
+		\par With the LSTM layer added into our previous model, the topologistic diagram of our model one changes into what Figure 4 shows:
+			\begin{figure}[h]
+				\includegraphics[width=5cm]{06_model_two}
+				\centering
+				\caption{Topologistic Diagram of Model Two} \label{fig:06_model_two}
+			\end{figure}
+		\par Compared with the model before, the LSTM has two major advantages:
+		\begin{itemize}
+			\item Regardless of the sequence length, the learning model always has the same
+			input size, because it is specific in terms of transition from one state to
+			another state, rather than specific in terms of a variable-length history of
+			states.
+			\item It is possible to use the same transition function $f$ with same parameters at every time step.
+		\end{itemize}
+		
+		\subsection{Data Procession}
+		To make the prediction has higher accuracy.We use a interpolation mehtod to make the data's precision raise up to month level. Here is our equation for the interpolation.
+		\begin{equation}
+		X_{i}(t_{j}) = \frac{(X_{i}(t) - X_{i}(t-1)) \cdot j}{12} 
+		\end{equation}
+		in this equation, the $t_{j}$ means the $j$th month, the $X_{i}(t_{j})$ means the amont of potential drug abuse cases in county i.
+		接下来我们将数据进行标准化，使用的公式如下
+		插入公式1
+		其中s表示的是数据的方差， $\mu$ 表示的数据的均值。
+		
+		\subsection{Model Traininning}
+		我们使用的来训练这个模型的误差函数是MSE
+		插入MSE公式2
+		我们训练的拟合图如下
+		插入一张训练拟合图
+		在上图中有两条曲线分别是在训练集合和在测试集合上，模型的误差。可以看到我们的模型最终收敛。
+		\subsection{Data Analysis}
+		通过训练后的模型，我们可以预测未来12个月左右的数据，以下是我们预测的数据图，
+		
+		插入热力图
+		
+		通过对于过往时间序列的分析，我们可以得知....
+			
+\section{Model3: An Auto Encoder Neual Network}
+	\subsection{Data Processing}
+	\begin{itemize}
+		\item 变量维度的统一：所给的数据中存在一些数据只有某些年份存在，而其他年份没有，，我们将这些数据直接剔除，最终将变量维度同一为.....需要在excel中计算
+		\item 数据类型的同一:所给的数据类型不止是数字类型的量，还有字符串类型，对于字符串类型我们进行把它们看作缺省或是利用 tokenizer 形成他们的one hot code
+	\end{itemize}
+	\subsection{Model construction}
+	在这部分，为了考虑社会经济因素的影响。我们为之前的网络模型设计了一个新的输入，于是网络的模型变为
 	
+	插入图像，模型3的结构图
+	
+	在右侧上方还是之前的结构而左侧上方是使用了三层的auto encoder 来把训练数据进行一个降维。降维后的数据是对于数据中的特征的提取。
+	利用提取出的特征我们对于我们已有的预测可以作出调整。为了综合这些因素的影响，我们后续添加了1个Merge Layer和3个Dense layer。
+	Auto Encoder Layer 是神经网络的一种，成功应用于信息检索和降维度....见书
+	\subsection{Model 训练}
+	 对于自编码器的训练我们采用
+	 P317页公式14.18
+	 作为我们的loss function 
+	 
+	 插入训练的拟合图
+	 
+	\subsection{Data Analysis}
+	为了找出最为重要的变量我们还对于输入和输出计算了Correlation coefficient
+	
+	插入公式，来自网页,相关系数。
+	
+	我们找到了如下这些参数，他们和我们的预测值的相关性系数最大。
+	为此我们跟踪绘制了这几个参数与毒品灾难泛滥的的历史图：
+	左边是几个特定变量的柱状图....对比右边是插入历史热力地图和
+	
+\sectoin{Strategy Making}
+	根据我们上边得出的数据预测我们修改以制定出如下政策
+	控制。。。量在设定范围内，由此可以通过修改和降低这一值的输入观察到如下状况，
+	左边是几个特定变量的柱状图....对比右边是插入历史热力地图
+	
+	
+
+
 
 \[
   \begin{pmatrix}{*{20}c}
